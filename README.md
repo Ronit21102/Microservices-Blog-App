@@ -4,3 +4,4 @@ Basic microservices app is done where on every post created or comment created I
 ![image](https://github.com/user-attachments/assets/0f886e15-29a8-4883-ab3a-97860e66310d)
 
 Now the how we will scale and deploy that part starts
+![image](https://github.com/user-attachments/assets/167c3019-6913-407a-b6f8-88b562d3fbab)
