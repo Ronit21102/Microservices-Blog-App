@@ -631,4 +631,68 @@ kubectl apply -f my-config.yaml
 - The **spec** section describes how the resource should behave, such as how many replicas of a Pod are needed or which container image to use.
 - Kubernetes uses these YAML files to create, update, and maintain the state of your resources in the cluster.
 
-With this foundational understanding, you'll be ready to follow along in your video lecture more easily!
+![image](https://github.com/user-attachments/assets/4b8e0c63-e991-4c9d-b3b2-7ff7f2beaf5f)
+
+Yes, that's correct! Here's how the process works in detail:
+
+---
+
+### **Flow of Traffic with LoadBalancer and Ingress**
+
+1. **Public IP Creation by LoadBalancer:**
+   - When you create a **Service** of type `LoadBalancer`, Kubernetes asks your cloud provider (e.g., AWS, GCP, Azure) to provision a public IP address and set up a load balancer in their infrastructure.
+   - This public IP becomes the external entry point for traffic into your Kubernetes cluster.
+
+2. **Routing to Ingress Controller:**
+   - The cloud provider's load balancer forwards all incoming requests to the Kubernetes nodes running the **Ingress Controller** (e.g., Ingress NGINX).
+   - These requests land on the port (commonly 80 for HTTP or 443 for HTTPS) that the Ingress Controller is listening on.
+
+3. **Ingress Controller Processes Requests:**
+   - The **Ingress Controller** checks the request against the rules defined in your **Ingress** resource(s). These rules specify:
+     - Which hostname (e.g., `api.example.com`) or path (e.g., `/posts`) maps to which Kubernetes **Service**.
+   - Based on the rules, it forwards the request to the appropriate **Service**.
+
+4. **Service to Pods:**
+   - The **Service** routes the traffic to one of the backend **pods** associated with it, handling internal load balancing across multiple pod instances.
+
+---
+
+### **Example**
+
+#### **Setup:**
+- A `LoadBalancer` Service exposes the Ingress Controller to the internet.
+- Ingress rules are defined to route requests to specific backend services.
+
+#### **Scenario:**
+1. A user visits `api.example.com/login`.
+2. The request flow:
+   - Public IP → Cloud Load Balancer → Ingress Controller → Backend Service (based on Ingress rules) → Pod.
+
+---
+
+### **Why Use Both LoadBalancer and Ingress?**
+
+1. **LoadBalancer:**
+   - Creates a single public IP address for your cluster.
+   - Forwards all traffic to the Ingress Controller.
+
+2. **Ingress:**
+   - Acts as the "smart router" inside your cluster.
+   - Allows you to define complex routing rules, such as:
+     - Path-based routing (e.g., `/posts` → Service A, `/users` → Service B).
+     - Host-based routing (e.g., `api.example.com` → Service A, `dashboard.example.com` → Service B).
+   - Provides centralized SSL/TLS termination and HTTP enhancements.
+
+---
+
+### **Why Not Use LoadBalancer for Each Service?**
+
+- **Cost:** Each `LoadBalancer` Service would create a separate cloud load balancer with its own public IP, which can get expensive.
+- **Manageability:** Ingress allows you to consolidate routing logic in one place instead of managing multiple public endpoints.
+- **Scalability:** With Ingress, you handle all external traffic with a single load balancer, simplifying scaling and administration.
+
+---
+
+### **Summary**
+- The **LoadBalancer** Service provides a single public IP to expose your cluster to the internet.
+- The **Ingress Controller** handles the actual routing of requests inside the cluster to the appropriate services and pods. It acts as a centralized router for external traffic.
