@@ -38,6 +38,6 @@ app.post("/events", (req, res) => {
 });
 
 app.listen(4000, () => {
-  console.log("updating so that we need to create new image");
+  console.log("updating so 100");
   console.log("listening on port 4000");
 });

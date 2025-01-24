@@ -1,14 +1,14 @@
-apiVersion: skaffold/v4beta11
+apiVersion: skaffold/v2alpha3
 kind: Config
 deploy:
   kubectl:
     manifests:
-      - "./infra/k8s/*.yaml"
+      - "./infra/k8s/*"
 build:
   local:
     push: false
   artifacts:
-    - image: ronit21102/client:latest
+    - image: ronit21102/client
       context: client
       docker:
         dockerfile: Dockerfile
@@ -16,7 +16,7 @@ build:
         manual:
           - src: 'src/**/*.js'
             dest: .
-    - image: ronit21102/comments:latest
+    - image: ronit21102/comments
       context: comments
       docker:
         dockerfile: Dockerfile
@@ -24,7 +24,7 @@ build:
         manual:
           - src: '*.js'
             dest: .
-    - image: ronit21102/event-bus:latest
+    - image: ronit21102/event-bus
       context: event-bus
       docker:
         dockerfile: Dockerfile
@@ -32,7 +32,7 @@ build:
         manual:
           - src: '*.js'
             dest: .
-    - image: ronit21102/moderation:latest
+    - image: ronit21102/moderation
       context: moderation
       docker:
         dockerfile: Dockerfile
@@ -40,7 +40,7 @@ build:
         manual:
           - src: '*.js'
             dest: .
-    - image: ronit21102/posts:latest
+    - image: ronit21102/posts
       context: posts
       docker:
         dockerfile: Dockerfile
@@ -48,7 +48,7 @@ build:
         manual:
           - src: '*.js'
             dest: .
-    - image: ronit21102/query:latest
+    - image: ronit21102/query
       context: query
       docker:
         dockerfile: Dockerfile
