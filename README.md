@@ -696,3 +696,114 @@ Yes, that's correct! Here's how the process works in detail:
 ### **Summary**
 - The **LoadBalancer** Service provides a single public IP to expose your cluster to the internet.
 - The **Ingress Controller** handles the actual routing of requests inside the cluster to the appropriate services and pods. It acts as a centralized router for external traffic.
+
+
+This is a snippet from a `skaffold.yaml` file, specifically within the `artifacts` section. It defines how Skaffold should handle the build and synchronization of your React (or other client-side) application. Here's a breakdown of what each part means:
+
+---
+
+### Breakdown of the Configuration:
+
+#### 1. **`artifacts`**:
+   - The `artifacts` section specifies the application or service to be built as a Docker image.
+   - Each `artifact` describes how to build an image for a specific component of your project (e.g., a frontend or backend).
+
+---
+
+#### 2. **`image: ronit21102/client:latest`**:
+   - This defines the name of the Docker image to be built and tagged.
+     - **`ronit21102`**: This is likely your Docker Hub username (or the namespace of your container registry).
+     - **`client`**: The name of the image.
+     - **`latest`**: The tag for the image. Typically used for the most recent version of the image.
+
+---
+
+#### 3. **`context: client`**:
+   - The `context` specifies the directory containing the code and `Dockerfile` for this artifact.
+   - In this case, Skaffold will look for the `Dockerfile` and source code inside the `client` directory.
+   - If your project is structured like this:
+     ```
+     root/
+       client/
+         Dockerfile
+         src/
+     ```
+     Then Skaffold will use the `client` directory as the build context.
+
+---
+
+#### 4. **`docker`**:
+   - This section specifies how Skaffold should build the Docker image.
+
+##### - `dockerfile: Dockerfile`:
+   - The name of the Dockerfile to use for building the image.
+   - Skaffold expects this Dockerfile to be located in the `context` directory (`client/Dockerfile`).
+
+---
+
+#### 5. **`sync`**:
+   - The `sync` section defines how Skaffold should handle file synchronization between your local development environment and the container running in the Kubernetes pod.
+   - Instead of rebuilding the Docker image and redeploying the pod for every code change, Skaffold can copy files directly into the running container.
+
+---
+
+##### - `manual`:
+   - **Manual synchronization** requires you to specify `src` (source files on your local machine) and `dest` (destination in the container).
+
+###### Example:
+```yaml
+sync:
+  manual:
+    - src: 'src/**/*.js'
+      dest: .
+```
+
+- **`src: 'src/**/*.js'`**:
+  - Specifies the files to watch for changes. In this case, all `.js` files in the `src` directory (and its subdirectories) are included.
+  - **Glob pattern**:
+    - `src/**/*.js`: Matches `.js` files in `src/` and any subfolders.
+
+- **`dest: .`**:
+  - Specifies the destination directory inside the container where the updated files will be synced.
+  - A `.` indicates the root of the container's working directory (set in your `Dockerfile` with `WORKDIR`).
+
+---
+
+### What This Does:
+1. **Image Build**:
+   - Skaffold builds a Docker image named `ronit21102/client:latest` using the `client/Dockerfile`.
+
+2. **Code Sync**:
+   - When a `.js` file inside `src/` is changed:
+     - Instead of rebuilding the entire image, Skaffold syncs the updated file directly into the container.
+     - This enables **hot-reloading** (if your app or framework supports it, like React's Fast Refresh).
+
+3. **Development Workflow**:
+   - You can run `skaffold dev`, and Skaffold will:
+     - Build the Docker image initially.
+     - Deploy the pod to your Kubernetes cluster.
+     - Watch for changes to `.js` files in `src/` and sync them into the running container without restarting the pod.
+
+---
+
+### Why Use Sync?
+
+**Without Sync**:
+- Any code change would require:
+  1. Rebuilding the Docker image.
+  2. Pushing the image to the registry.
+  3. Redeploying the Kubernetes pod.
+
+This can take a significant amount of time, especially for small changes.
+
+**With Sync**:
+- File changes are synced directly into the running container, and the app can hot-reload or refresh immediately.
+- This drastically reduces the feedback loop time during development.
+
+---
+
+### TL;DR:
+This configuration:
+- Builds the Docker image `ronit21102/client:latest` from the `client` directory.
+- Watches for changes to `.js` files in `src/`.
+- Syncs those changes directly into the container's working directory (`.`) in the pod, enabling rapid feedback during development.
