@@ -1,3 +1,5 @@
+<img width="1916" height="920" alt="image" src="https://github.com/user-attachments/assets/c3088b7c-cbc2-43b4-9f3f-d57e3b52196e" />
+
 # Microservices
 Basic microservices app is done where on every post created or comment created It will trigger a event to inform all the services and they can act accordingly
 
